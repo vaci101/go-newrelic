@@ -1,7 +1,7 @@
 <?php
 
 class GO_NewRelic
-{	
+{
 	public function __construct()
 	{
 		// exit early if we don't have the New Relic extension
@@ -11,7 +11,7 @@ class GO_NewRelic
 			return FALSE;
 		}
 
-		// config array keys are the NR config names with sanitize_title_with_dashes() applied 
+		// config array keys are the NR config names with sanitize_title_with_dashes() applied
 		// and the `newrelic` prefix removed
 		// see https://newrelic.com/docs/php/php-agent-phpini-settings for details
 		$this->config = apply_filters( 'go_config', array(
@@ -23,7 +23,7 @@ class GO_NewRelic
 			'error-collector-enabled' => FALSE,
 		), 'go-newrelic' );
 
-		// the license key is typically set elsewhere during the daemon/module installation, 
+		// the license key is typically set elsewhere during the daemon/module installation,
 		// but this allows some potential future where the license key is set in the WP dashboard
 		if ( ! empty( $this->config['license'] ) )
 		{
@@ -71,7 +71,9 @@ class GO_NewRelic
 		add_action( 'init' , array( $this , 'init' ) );
 	}
 
-	// add user info now that we know it
+	/**
+	 * add user info now that we know it
+	 */
 	public function init()
 	{
 		// not all versions of the php extension support this method
@@ -80,7 +82,7 @@ class GO_NewRelic
 			return;
 		}
 
-		// see https://newrelic.com/docs/features/browser-traces#set_user_attributes 
+		// see https://newrelic.com/docs/features/browser-traces#set_user_attributes
 		// for docs on how to use the user info in the transaction trace
 		if ( is_user_logged_in() )
 		{
@@ -93,14 +95,21 @@ class GO_NewRelic
 		}
 	}
 
-	// track the template we're using
+	/**
+	 * track the template we're using
+	 *
+	 * @param $template excluded template
+	 * @return $template included template
+	 */
 	public function template_include( $template )
 	{
 		newrelic_add_custom_parameter( 'template' , $template );
 		return $template;
 	}
 
-	// a method other plugins can call to ignore this transaction
+	/**
+	 * a method other plugins can call to ignore this transaction
+	 */
 	public function ignore()
 	{
 		newrelic_ignore_transaction();
@@ -113,7 +122,7 @@ function go_newrelic()
 	global $go_newrelic;
 
 	if ( ! isset( $go_newrelic ) || ! is_object( $go_newrelic ) )
-	{	
+	{
 		$go_newrelic = new GO_NewRelic();
 	}
 
